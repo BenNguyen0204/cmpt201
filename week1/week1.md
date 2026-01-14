@@ -10,6 +10,8 @@
     - Kernel (core OS services)
     - Hardware (CPU, memory, I/O)
 
+***
+
 ### Hardware Basics (Von Neumann):
 - Two fundamental components: computation (CPU) + data (memory/storage)
 - CPU fetches data/instructions from memory
@@ -67,25 +69,40 @@
 - *Kernel mode (Ring 0)*: full privileges (kernel runs here)
 - Purpose: safety + isolation (apps can’t directly control hardware).
 
-Major OS abstractions
+#### Major OS abstractions
+- System
+    - Device drivers
+- Processing:
+    - Process = running program with its own resources
+    - Threads = execution paths inside a process
+    - Synchronization and scheduling
+- Memory:
+    - Virtual memory = each process sees its own “private” address space
+    - Physical memory and paging
+- Storage:
+    - File systems and VFS (Virtual File System)
+        - VFS: OS layer that gives one common way to open/read/write files, no matter the actual file system.
+- Networking
+    - Sockets, TCP, UDP and IP
 
-Process = running program with its own resources
+***
 
-Threads = execution paths inside a process
+### Application layer
+- Program → process pipeline
+- Lifetime of a Program:
+    - Source code → compiler → executable machine code → loaded into memory → running process
 
-Virtual memory = each process sees its own “private” address space
+#### Compilation vs. Interpretation
+- Compiled (C/C++): code -> machine code before run (fast)
+- Interpreted (Python): run code line b line at run time (portable but slower)
 
-File abstraction: many things are treated like files (read/write)
+#### Intermediate Representation (IR)
+- low-level instructions but do not target specifc CPUS
+    - Step 1: Compile souce code to low-level IR instructions
+    - Step 2: Use backend compiler to compile IR down to an architecture-specific executable
 
-Program → process pipeline
-
-Source code → compiler → executable machine code → loaded into memory → running process
-
-Compiled (C/C++): fast, but machine-specific binary
-
-Interpreted (Python): portable, slower
-
-Hybrid/VM style: compile to intermediate form (bytecode) then run/translate
+#### POSIX (Portable Operating System Interface)
+- Standard for (user-level) softw
 
 POSIX + portability
 
