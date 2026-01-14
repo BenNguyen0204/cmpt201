@@ -48,6 +48,8 @@
 - 32-bit address space: 2^32 bytes = 4GB
 - 64-bit address space: extremely large (most computers are 64-bit architectures now)
 
+***
+
 ### Kernel (what the OS does)
 - OS = kernel + tools (shell/GUI/utilities)
 - Handles CPU scheduling, memory management, devices & I/O, file system, networking, and security.
