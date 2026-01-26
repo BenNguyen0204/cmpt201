@@ -160,6 +160,7 @@ ls
 ```
 - `chmod +x myscript.sh` to allow running
 - `./myscript.sh` chmod needed or `bash myscript.sh` no chmod needed
+
 - **Variables**: A temporary store for information (data)
     - Ex: `name=Ryan`, `age = 20`
     - Put **$** in front to read it: `echo "$name"`
@@ -176,9 +177,11 @@ ls
         - $RANDOM = random number
         - $LINENO = current line number in script
     - `export var1` will allow var1 to be accessed by the child script, say `./script2.sh`
-- **Input**: `read`
-    - `-p` specify a prompt
-    - `-s` make the input silent
+
+- **Input**: 
+    - `read`
+        - `-p` specify a prompt
+        - `-s` make the input silent
 ```bash
 #!/bin/bash
 # Ask the user for login details
@@ -187,10 +190,10 @@ read -sp 'Password: ' passvar
 echo
 echo Thankyou $uservar we now have your login details
 ```
-- Reading from STDIN
-    - STDIN - /dev/stdin
-    - STDOUT - /dev/stdout
-    - STDERR - /dev/stderr
+    - Reading from STDIN
+        - STDIN - /dev/stdin
+        - STDOUT - /dev/stdout
+        - STDERR - /dev/stderr
 ```bash
 #!/bin/bash
 # A basic summary of my sales report
@@ -200,4 +203,71 @@ echo
 cat /dev/stdin | cut -d' ' -f 2,3 | sort
 ```
 
+- **Arithmetic!**
+    - Operator: - `+, -, \*, /, ++, --, %`	addition, subtraction, multiply, divide, add 1, min 1, modulus
+    - `let <arithmetic expression>`. Ex: `let a=5+4`
+    - `expr item1 operator item2`. Ex: `expr 5 + 4`
+    - `$(( expression ))`: Double Parentheses. Ex: `a=$(( 4 + 5 ))`
+    - `${#variable}`: Length of a Variable
+
+- **If Statements!**
+```bash
+#if_example.sh
+#!/bin/bash
+if [ $1 -gt 100 ]
+    then
+        echo Hey that\'s a large number.
+        pwd
+fi
+date
+```
+- `./if_example.sh 15` will print date and  `./if_example.sh 150` will print `Hey that\'s a large number.`
+
+![alt text](Test.png)
+
+- If else
+```bash
+if [ <some test> ]
+then
+    <commands>
+else
+    <other commands>
+fi
+```
+
+- If Elif Else
+```bash
+if [ <some test> ]
+then
+    <commands>
+elif [ <some test> ]
+then
+    <different commands>
+else
+    <other commands>
+fi
+```
+- Boolean operation: And - &&. Or - ||
+```bash
+or.sh
+#!/bin/bash
+# or example
+if [ $USER == 'bob' ] || [ $USER == 'andy' ]
+then
+    ls -alh
+else
+    ls
+fi
+```
+- Case:
+```bash
+case <variable> in
+<pattern 1>)
+    <commands>
+    ;;
+<pattern 2>)
+    <other commands>
+    ;;
+esac
+```
 
