@@ -223,7 +223,7 @@ date
 ```
 - `./if_example.sh 15` will print date and  `./if_example.sh 150` will print `Hey that\'s a large number.`
 
-![alt text](Test.png)
+![alt text](test.png)
 
 - If else
 ```bash
@@ -302,4 +302,232 @@ do
     echo $value
 done
 echo All done
+```
+
+## Basics of Compilation
+- **Compilation Pipeline**
+    1. Preprocessing
+        - Removes comments (//, /* */)
+        - Expands preprocessor directives like #include and #define
+        - Output: expanded C code
+        - Ex: clang -E file.c
+    2. Compiling
+        - Converts preprocessed C → machine code
+        - Each .c source file → .o object file
+        - .o contains machine instructions + metadata
+        - Ex: clang -c file.c
+    3. Linking
+        - Combines all .o files + libraries
+        - Produces final executable
+        - Ex: clang -o main.o other.o
+- **Librabry**
+    - Static: compilte time. .a. Naming: liub<name>.a
+    - Dynamic: run time. .so. Naming: lib<name>.so
+    - Generate archive: ar -r <archive file name> <object files>
+
+## Makefile
+- Build automation tool. Rebuilds only what changed
+
+### Rule syntax:
+```bash
+target: prerequisites
+    command
+    command
+
+# Example:
+blah: blah.o
+	clang -o blah blah.o # Runs third
+
+blah.o: blah.c
+	clang -c blah.c -o blah.o # Runs second
+
+# Typically blah.c would already exist, but I want to limit any additional required files
+blah.c:
+	echo "int main() { return 0; }" > blah.c # Runs first
+```
+
+- Make clean: 
+```bash
+.PHONY: clean
+clean:
+	rm -f file1 file2 some_file
+```
+
+- Make all:
+```bash
+all: one two three
+one:
+	touch one
+two:
+	touch two
+three:
+	touch three
+
+clean:
+	rm -f one two three
+
+```
+- Multiple target: using `$@` is an automatic variable
+```bash
+all: f1.o f2.o
+
+f1.o f2.o:
+	echo $@
+# Equivalent to:
+# f1.o:
+#	 echo f1.o
+# f2.o:
+#	 echo f2.o
+```
+
+-  Wildcard
+    - *: Find files
+    - %: Match pattern
+```bash
+thing_wrong := *.o # Don't do this! '*' will not get expanded
+thing_right := $(wildcard *.o)
+
+all: one two three four
+
+# Fails, because $(thing_wrong) is the string "*.o"
+one: $(thing_wrong)
+
+# Stays as *.o if there are no files that match this pattern :(
+two: *.o 
+
+# Works as you would expect! In this case, it does nothing.
+three: $(thing_right)
+
+# Same as rule three
+four: $(wildcard *.o)
+```
+
+- Automatic Variables
+```bash
+hey: one two
+	# Outputs "hey", since this is the target name
+	echo $@
+
+	# Outputs all prerequisites newer than the target
+	echo $?
+
+	# Outputs all prerequisites
+	echo $^
+
+	# Outputs the first prerequisite
+	echo $<
+
+	touch hey
+
+one:
+	touch one
+
+two:
+	touch two
+
+clean:
+	rm -f hey one two
+```
+
+- Implicit Rules:
+```bash
+CC = gcc # Flag for implicit rules
+CFLAGS = -g # Flag for implicit rules. Turn on debug info
+
+# Implicit rule #1: blah is built via the C linker implicit rule
+# Implicit rule #2: blah.o is built via the C compilation implicit rule, because blah.c exists
+blah: blah.o
+
+blah.c:
+	echo "int main() { return 0; }" > blah.c
+
+clean:
+	rm -f blah*
+```
+
+- Static pattern rules:
+```bash
+objects = foo.o bar.o all.o
+all: $(objects)
+	$(CC) $^ -o all
+
+foo.o: foo.c
+	$(CC) -c foo.c -o foo.o
+
+bar.o: bar.c
+	$(CC) -c bar.c -o bar.o
+
+all.o: all.c
+	$(CC) -c all.c -o all.o
+
+all.c:
+	echo "int main() { return 0; }" > all.c
+
+%.c:
+	touch $@
+
+clean:
+	rm -f *.c *.o all
+
+# efficient way
+objects = foo.o bar.o all.o
+all: $(objects)
+	$(CC) $^ -o all
+# Syntax - targets ...: target-pattern: prereq-patterns ...
+# In the case of the first target, foo.o, the target-pattern matches foo.o and sets the "stem" to be "foo".
+# It then replaces the '%' in prereq-patterns with that stem
+$(objects): %.o: %.c
+	$(CC) -c $^ -o $@
+
+all.c:
+	echo "int main() { return 0; }" > all.c
+
+# Note: all.c does not use this rule because Make prioritizes more specific matches when there is more than one match.
+%.c:
+	touch $@
+
+clean:
+	rm -f *.c *.o all
+```
+
+- Static pattern rules and filter
+```bash
+obj_files = foo.result bar.o lose.o
+src_files = foo.raw bar.c lose.c
+
+all: $(obj_files)
+# Note: PHONY is important here. Without it, implicit rules will try to build the executable "all", since the prereqs are ".o" files.
+.PHONY: all 
+
+# Ex 1: .o files depend on .c files. Though we don't actually make the .o file.
+$(filter %.o,$(obj_files)): %.o: %.c
+	echo "target: $@ prereq: $<"
+
+# Ex 2: .result files depend on .raw files. Though we don't actually make the .result file.
+$(filter %.result,$(obj_files)): %.result: %.raw
+	echo "target: $@ prereq: $<" 
+
+%.c %.raw:
+	touch $@
+
+clean:
+	rm -f $(src_files)
+```
+
+- Pattern rules:
+```bash
+# Define a pattern rule that compiles every .c file into a .o file
+%.o : %.c
+		$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+```
+
+- Double colon rules:
+```bash
+all: blah
+
+blah::
+	echo "hello"
+
+blah::
+	echo "hello again"
 ```
