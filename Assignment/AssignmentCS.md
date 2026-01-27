@@ -270,4 +270,36 @@ case <variable> in
     ;;
 esac
 ```
+- **Loops!**
+- While loops
+```bash
+while [ <some test> ]
+do
+    <commands>
+done
+```
 
+- Until loops
+```bash
+until [ <some test> ]
+do
+    <commands>
+done
+```
+
+- For loops
+```bash
+for var in <list>
+do
+    <commands>
+done
+```
+
+- Ranges
+```bash
+for value in {10..0..2}
+do
+    echo $value
+done
+echo All done
+```
